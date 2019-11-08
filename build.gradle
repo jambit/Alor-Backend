@@ -1,0 +1,45 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.sherter.google-java-format' version '0.8'
+    id 'jacoco'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    implementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
+    runtimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
+}
+test {
+    useJUnitPlatform()
+}
+
+test.finalizedBy jacocoTestReport
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/']
+        }
+    }
+    test {
+        java {
+            srcDirs = ["test/"]
+        }
+    }
+}
+
+run{
+    standardInput = System.in
+}
+
+mainClassName = 'com.jambit.Main'
+tasks.verifyGoogleJavaFormat.ignoreFailures = true
