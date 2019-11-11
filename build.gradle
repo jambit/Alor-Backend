@@ -9,6 +9,8 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
+
+
 repositories {
     jcenter()
     mavenCentral()
@@ -17,6 +19,7 @@ repositories {
 dependencies {
     implementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
     runtimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
+    compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.14'
 }
 test {
     useJUnitPlatform()

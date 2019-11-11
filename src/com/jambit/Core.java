@@ -1,21 +1,15 @@
 package com.jambit;
 
 public class Core {
-    private DataBaseIO dataBaseIO;
-    private SoundInput soundInput;
+  private DataBaseIO dataBaseIO;
+  private SoundInput soundInput;
 
-    /**
-     *
-     */
-    public Core(){
-        dataBaseIO = new DataBaseIO();
-        soundInput = new SoundInput();
-    }
+  /** */
+  public Core() {
+    dataBaseIO = new DataBaseIO();
+    soundInput = new SoundInput();
+  }
 
-    /**
-     *
-     */
-    public void run(){
-
-    }
+  /** */
+  public void run() {}
 }
