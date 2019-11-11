@@ -37,7 +37,7 @@ sourceSets {
     }
 }
 
-run{
+run {
     standardInput = System.in
 }
 
