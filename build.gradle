@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'war'
     id 'application'
     id 'com.github.sherter.google-java-format' version '0.8'
     id 'jacoco'
@@ -17,9 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
-    runtimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
-    compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.14'
+    compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.25.1'
 }
 test {
     useJUnitPlatform()
