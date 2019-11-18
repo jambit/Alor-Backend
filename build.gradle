@@ -32,7 +32,7 @@ test.finalizedBy jacocoTestReport
 sourceSets {
     main {
         java {
-            srcDirs = ['src/main/']
+            srcDirs = ['src/']
         }
     }
     test {
