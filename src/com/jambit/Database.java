@@ -7,39 +7,28 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 public class Database {
-  public static Database database = null;
 
-  private static final String PROPERTY_PATH = ("config/app.properties");
+  private static String PROPERTY_PATH = ("config/app.properties");
   private Properties catalogProps = new Properties();
 
   private Connection activeDatabaseConnection;
 
-  public Database() throws MultipleConnectionException {
-    if (database == null) {
-      database = this;
-    } else {
-      throw new MultipleConnectionException("Limited to one connection");
-    }
-  }
-
   /** Connects to the database */
-  private void connect() throws IOException, MultipleConnectionException, SQLException {
-    if (database == null) {
-      catalogProps.load(new FileInputStream(PROPERTY_PATH));
-      activeDatabaseConnection =
-          DriverManager.getConnection(
-              "jdbc:mysql://"
-                  + catalogProps.getProperty("database.hostIP")
-                  + ":"
-                  + catalogProps.getProperty("database.port")
-                  + "/"
-                  + catalogProps.getProperty("database.databaseName"),
-              catalogProps.getProperty("database.username"),
-              catalogProps.getProperty("database.password"));
+  public void connect() throws IOException, MultipleConnectionException, SQLException {
 
-    } else {
-      throw new MultipleConnectionException("Limited to one connection");
-    }
+    catalogProps.load(new FileInputStream(PROPERTY_PATH));
+    activeDatabaseConnection =
+        DriverManager.getConnection(
+            "jdbc:mysql://"
+                + catalogProps.getProperty("database.hostIP")
+                + ":"
+                + catalogProps.getProperty("database.port")
+                + "/"
+                + catalogProps.getProperty("database.databaseName"),
+            catalogProps.getProperty("database.username"),
+            catalogProps.getProperty("database.password"));
+
+    throw new MultipleConnectionException("Limited to one connection");
   }
 
   /**
@@ -94,23 +83,28 @@ public class Database {
     st.executeUpdate(query.toString());
   }
 
-  public void basicWrite(String table, String columns, String data) {
-    try {
-      Statement st = activeDatabaseConnection.createStatement();
-      st.executeUpdate("INSERT INTO " + table + "(" + columns + ") VALUES (" + data + ")");
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-  }
-
+  /**
+   * Get the Unix timestamp in seconds
+   *
+   * @return Unix timestamp in seconds
+   */
   private long getCurrentTime() {
     return System.currentTimeMillis() / 1000L;
   }
 
-  private void checkValid() throws SQLException, TimeOutException {
+  /**
+   * Checks if MySQL connection is valid
+   *
+   * @throws TimeOutException Throws exception on timeout
+   */
+  public void checkValid() throws SQLException, TimeOutException {
     if (!activeDatabaseConnection.isValid(1)) {
       throw new TimeOutException("Connection to Database has been lost");
     }
+  }
+
+  public static void changePropertyPath(String path) {
+    PROPERTY_PATH = path;
   }
 
   public static class MultipleConnectionException extends Exception {
