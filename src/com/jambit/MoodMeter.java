@@ -4,21 +4,22 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/mdm")
+@Path("/MoodMeter")
 public class MoodMeter {
 
   @GET
   @Path("avg")
   @Produces(MediaType.APPLICATION_JSON)
   public Response getAvg(@DefaultValue("4") @QueryParam("t") String time) {
-    return Response.status(200).entity(time).build();
+
+    return Response.status(200).entity(null).build();
   }
 
   @GET
-  @Path("dist")
+  @Path("distro")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getDist(@DefaultValue("4") @QueryParam("t") String time) {
-    return Response.status(200).entity(time).build();
+  public Response getDistribution(@DefaultValue("4") @QueryParam("t") String time) {
+    return Response.status(200).entity(null).build();
   }
 
   @POST
