@@ -10,4 +10,16 @@ public class MoodMeterDomain {
     this.vote = vote;
     this.time = time;
   }
+
+  public int getId() {
+    return id;
+  }
+
+  public int getVote() {
+    return vote;
+  }
+
+  public long getTime() {
+    return time;
+  }
 }
