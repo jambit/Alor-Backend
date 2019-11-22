@@ -10,4 +10,12 @@ public class MoodEntries {
     this.vote = vote;
     this.time = time;
   }
+
+  public boolean checkEquals(MoodEntries obj) {
+    if (this.id != obj.id || this.vote != obj.vote || this.time != obj.time) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 }

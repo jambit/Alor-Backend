@@ -67,7 +67,10 @@ public class DatabaseConnection {
             .append(" BETWEEN ")
             .append(currentTime - (t * 60 * 60))
             .append(" AND ")
-            .append(currentTime);
+            .append(currentTime)
+            .append(" ORDER BY ")
+            .append(databaseProps.getProperty("table.moodMeter.id"))
+            .append(" ASC");
 
     return moodMeterSQLQuery(query.toString());
   }
@@ -81,7 +84,10 @@ public class DatabaseConnection {
     StringBuilder query =
         new StringBuilder()
             .append("SELECT * FROM ")
-            .append(databaseProps.getProperty("table.moodMeter"));
+            .append(databaseProps.getProperty("table.moodMeter"))
+            .append(" ORDER BY ")
+            .append(databaseProps.getProperty("table.moodMeter.id"))
+            .append(" ASC");
     return moodMeterSQLQuery(query.toString());
   }
 
