@@ -1,35 +1,37 @@
 package com.jambit;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.jambit.domain.MoodEntries;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+/*
+TODO:
+   - More Tests
+   - Implement H2
+   - Delete Database content after all tests
+ */
+
 class DatabaseConnectionTest {
-    DatabaseConnection databaseConnection;
+  private static DatabaseConnection databaseConnection;
 
+  @BeforeAll
+  static void init() throws IOException, SQLException {
+    DatabaseConnection.changePropertyPath("config/appTest.properties");
+    databaseConnection = DatabaseConnection.getInstance();
+  }
 
-    public void test() {
-        try {
-            databaseConnection = DatabaseConnection.getInstance();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        try {
-            DatabaseConnection.changePropertyPath("config/appTest.properties");
-        } catch (IOException e) {
-
-        }
-        try {
-            DatabaseConnection.getInstance();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
+  @Test
+  public void insertTest() throws SQLException {
+    MoodEntries testValue =
+        new MoodEntries(0, (int) Math.round(Math.random() * 10), System.currentTimeMillis() / 1000);
+    databaseConnection.writeMoodEntries(testValue);
+    ArrayList<MoodEntries> dbOutputValues = databaseConnection.fetchAllMoodEntries();
+    assertEquals(dbOutputValues.get(dbOutputValues.size() - 1).time, testValue.time);
+    assertEquals(dbOutputValues.get(dbOutputValues.size() - 1).vote, testValue.vote);
+  }
 }
