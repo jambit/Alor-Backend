@@ -1,18 +1,19 @@
 package com.jambit.rest;
 
-import com.jambit.services.MoodMeterAverageService;
+import com.jambit.services.moodmeter.MoodMeterAverageService;
+import com.jambit.services.moodmeter.MoodMeterDistributionService;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/MoodMeter")
 public class MoodMeterAPI {
-  private MoodMeterAverageService moodMeterAverageService = MoodMeterAverageService.getInstance();
 
   @GET
   @Path("avg")
   @Produces(MediaType.APPLICATION_JSON)
   public Response getAvg(@DefaultValue("4") @QueryParam("t") String time) {
+    MoodMeterAverageService moodMeterAverageService = MoodMeterAverageService.getInstance();
     moodMeterAverageService.setTime(Float.parseFloat(time));
     return Response.status(200).entity(moodMeterAverageService.run()).build();
   }
@@ -21,8 +22,10 @@ public class MoodMeterAPI {
   @Path("distro")
   @Produces(MediaType.APPLICATION_JSON)
   public Response getDistribution(@DefaultValue("4") @QueryParam("t") String time) {
-
-    return Response.status(200).entity(null).build();
+    MoodMeterDistributionService moodMeterDistributionService =
+        MoodMeterDistributionService.getInstance();
+    moodMeterDistributionService.setTime(Float.parseFloat(time));
+    return Response.status(200).entity(moodMeterDistributionService.run()).build();
   }
 
   @POST

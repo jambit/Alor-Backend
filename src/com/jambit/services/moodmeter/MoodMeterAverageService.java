@@ -1,6 +1,7 @@
-package com.jambit.services;
+package com.jambit.services.moodmeter;
 
 import com.jambit.domain.MoodEntries;
+import com.jambit.services.Service;
 import java.util.ArrayList;
 
 public class MoodMeterAverageService implements Service {
