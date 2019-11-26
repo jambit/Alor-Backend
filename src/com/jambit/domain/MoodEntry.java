@@ -2,10 +2,10 @@ package com.jambit.domain;
 
 public class MoodEntry {
   public Integer id;
-  public int vote;
-  public long time;
+  public Integer vote;
+  public Long time;
 
-  public MoodEntry(Integer id, int vote, long time) {
+  public MoodEntry(Integer id, Integer vote, Long time) {
     this.id = id;
     this.vote = vote;
     this.time = time;

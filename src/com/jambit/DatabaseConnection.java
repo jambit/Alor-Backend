@@ -11,7 +11,6 @@ public class DatabaseConnection {
 
   private static DatabaseConnection databaseInstance = null;
   private static String PROPERTY_PATH = ("config/app.properties");
-
   private static Properties databaseProps = new Properties();
 
   private Connection activeDatabaseConnection;
@@ -38,6 +37,12 @@ public class DatabaseConnection {
   private void connect() throws SQLException, IOException {
     databaseProps.load(new FileInputStream(PROPERTY_PATH));
 
+    try {
+      Class.forName("com.mysql.jdbc.Driver");
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+
     StringBuilder connectionLink =
         new StringBuilder()
             .append("jdbc:mysql://")
@@ -54,8 +59,6 @@ public class DatabaseConnection {
             connectionLink.toString(),
             databaseProps.getProperty("database.username"),
             databaseProps.getProperty("database.password"));
-
-    System.out.println("Connection successful!!!");
   }
 
   /**
@@ -87,6 +90,7 @@ public class DatabaseConnection {
         .append(databaseProps.getProperty("table.moodMeter.id"))
         .append(" ASC");
 
+    System.out.println("[" + currentTime + "] " + query);
     return fetchMoodMeterEntriesSQL(query.toString());
   }
 
@@ -125,7 +129,8 @@ public class DatabaseConnection {
    *
    * @param input The object to use for the entry
    */
-  public void writeMoodEntry(MoodEntry input) throws SQLException {
+  public MoodEntry writeMoodEntry(MoodEntry input) throws SQLException {
+    input.time = getCurrentTimeInSeconds();
     StringBuilder query =
         new StringBuilder()
             .append("INSERT INTO ")
@@ -142,7 +147,14 @@ public class DatabaseConnection {
             .append(")");
 
     Statement st = activeDatabaseConnection.createStatement();
-    st.executeUpdate(query.toString());
+    st.executeUpdate(query.toString(), Statement.RETURN_GENERATED_KEYS);
+
+    ResultSet rs = st.getGeneratedKeys();
+    if (rs.next()) {
+      input.id = rs.getInt(1);
+    }
+
+    return input;
   }
 
   /**
