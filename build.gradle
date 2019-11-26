@@ -43,6 +43,13 @@ sourceSets {
     }
 }
 
+war {
+    from('config') {
+        include 'appTest.properties'
+        into ''
+    }
+}
+
 run {
     standardInput = System.in
 }

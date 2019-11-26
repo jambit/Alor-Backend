@@ -1,7 +1,10 @@
 package com.jambit.services.moodmeter;
 
-import com.jambit.domain.MoodEntries;
+import com.jambit.DatabaseConnection;
+import com.jambit.domain.MoodEntry;
 import com.jambit.services.Service;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class MoodMeterAverageService implements Service {
@@ -11,8 +14,9 @@ public class MoodMeterAverageService implements Service {
 
   private MoodMeterAverageService() {}
 
-  public Object run() {
-    return calculateMoodAverage(new ArrayList<MoodEntries>());
+  public Object run() throws IOException, SQLException {
+    DatabaseConnection db = DatabaseConnection.getInstance();
+    return calculateMoodAverage(db.fetchMoodEntries(time));
   }
 
   public static MoodMeterAverageService getInstance() {
@@ -22,7 +26,7 @@ public class MoodMeterAverageService implements Service {
     return instance;
   }
 
-  private float calculateMoodAverage(ArrayList<MoodEntries> moodEntries) {
+  private float calculateMoodAverage(ArrayList<MoodEntry> moodEntries) {
     float entryCount = moodEntries.size();
     float entrySumm = 0;
     for (int i = 0; i < entryCount; i++) {

@@ -1,6 +1,7 @@
 package com.jambit;
 
 import com.jambit.domain.MoodEntry;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
@@ -10,24 +11,36 @@ import java.util.Properties;
 public class DatabaseConnection {
 
   private static DatabaseConnection databaseInstance = null;
-  private static String PROPERTY_PATH = ("config/app.properties");
+  private static String PROPERTY_PATH = ("appTest.properties");
   private static Properties databaseProps = new Properties();
 
   private Connection activeDatabaseConnection;
 
   private DatabaseConnection() {}
 
-  public static DatabaseConnection getInstance() throws IOException, SQLException {
+  public static DatabaseConnection getInstance() throws SQLException {
+    File file = new File("file.txt");
+    System.out.println(System.getProperty("catalina.base"));
+    try {
+      databaseProps.load(new FileInputStream(PROPERTY_PATH));
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     if (databaseInstance == null) {
       databaseInstance = new DatabaseConnection();
-      databaseInstance.connect();
     }
+    databaseInstance.connect();
     return databaseInstance;
   }
 
   /** Connects to the database */
-  private void connect() throws SQLException, IOException {
-    databaseProps.load(new FileInputStream(PROPERTY_PATH));
+  private void connect() throws SQLException {
+    try {
+      Class.forName("com.mysql.jdbc.Driver");
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
 
     StringBuilder connectionLink =
         new StringBuilder()
@@ -38,7 +51,7 @@ public class DatabaseConnection {
             .append("/")
             .append(databaseProps.getProperty("database.databaseName"));
 
-    System.out.println("Connecting to \"" + connectionLink + "\"");
+    System.err.println("Connecting to \"" + connectionLink + "\"");
 
     activeDatabaseConnection =
         DriverManager.getConnection(
@@ -57,18 +70,19 @@ public class DatabaseConnection {
    */
   public ArrayList<MoodEntry> fetchMoodEntries(Float hours) throws SQLException {
     long currentTime = getCurrentTimeInSeconds();
+    long startTime = (long) (currentTime - (hours * 60 * 60));
 
     StringBuilder query =
         new StringBuilder()
             .append("SELECT * FROM ")
-            .append(databaseProps.getProperty("table.moodMeter"))
-            .append(" WHERE ")
-            .append(databaseProps.getProperty("table.moodMeter.time"));
+            .append(databaseProps.getProperty("table.moodMeter"));
 
     if (hours != null) {
       query
+          .append(" WHERE ")
+          .append(databaseProps.getProperty("table.moodMeter.time"))
           .append(" BETWEEN ")
-          .append(currentTime - (hours * 60 * 60)) /*Calculate the hours into seconds*/
+          .append(startTime)
           .append(" AND ")
           .append(currentTime);
     }
@@ -78,7 +92,10 @@ public class DatabaseConnection {
         .append(databaseProps.getProperty("table.moodMeter.id"))
         .append(" ASC");
 
-    return moodMeterSQLQuery(query.toString());
+    ArrayList<MoodEntry> x = moodMeterSQLQuery(query.toString());
+    ;
+    System.out.println("[" + currentTime + "] " + query + " | SIZE: " + x.size());
+    return x;
   }
 
   /**

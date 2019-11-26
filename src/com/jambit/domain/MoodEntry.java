@@ -12,10 +12,6 @@ public class MoodEntry {
   }
 
   public boolean checkEquals(MoodEntry obj) {
-    if (this.id != obj.id || this.vote != obj.vote || this.time != obj.time) {
-      return false;
-    } else {
-      return true;
-    }
+    return this.id == obj.id && this.vote == obj.vote && this.time == obj.time;
   }
 }

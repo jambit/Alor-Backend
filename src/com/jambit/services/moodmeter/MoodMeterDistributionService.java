@@ -1,6 +1,6 @@
 package com.jambit.services.moodmeter;
 
-import com.jambit.domain.MoodEntries;
+import com.jambit.domain.MoodEntry;
 import com.jambit.services.Service;
 import java.util.ArrayList;
 
@@ -12,7 +12,7 @@ public class MoodMeterDistributionService implements Service {
   private MoodMeterDistributionService() {}
 
   public Object run() {
-    return getDistribution(new ArrayList<MoodEntries>());
+    return getDistribution(new ArrayList<MoodEntry>());
   }
 
   public static MoodMeterDistributionService getInstance() {
@@ -22,9 +22,9 @@ public class MoodMeterDistributionService implements Service {
     return instance;
   }
 
-  private int[] getDistribution(ArrayList<MoodEntries> moodEntries) {
+  private int[] getDistribution(ArrayList<MoodEntry> moodEntries) {
     int[] distro = new int[10];
-    for (MoodEntries moodEntry : moodEntries) {
+    for (MoodEntry moodEntry : moodEntries) {
       if (moodEntry.vote > 0 && moodEntry.vote <= 10) {
         distro[moodEntry.vote - 1]++;
       }
