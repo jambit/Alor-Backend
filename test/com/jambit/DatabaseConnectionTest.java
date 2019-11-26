@@ -4,15 +4,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.jambit.domain.MoodEntry;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 /*
 TODO:
-   - Delete Database content after all tests (@Afterall)
    - Implement H2 (optional)
  */
 
@@ -27,41 +26,65 @@ class DatabaseConnectionTest {
 
   @Test
   @Order(1)
-  public void writeIntoDatabase() throws SQLException {
-    MoodEntry expectedOutput =
-        new MoodEntry(0, (int) Math.round(Math.random() * 10), System.currentTimeMillis() / 1000);
-    databaseConnection.writeMoodEntry(expectedOutput);
-    ArrayList<MoodEntry> actualOutput = databaseConnection.fetchAllMoodEntries();
-    assertTrue(actualOutput.get(actualOutput.size() - 1).checkEquals(expectedOutput));
+  public void writeMoodEntry_Persist_ReturnSingleEntry() throws SQLException {
+    MoodEntry expected = generateMoodEntryTestData(1).get(0);
+    databaseConnection.writeMoodEntry(expected);
+    MoodEntry actual = databaseConnection.fetchAllMoodEntries().get(0);
+    assertTrue(actual.checkEquals(expected));
   }
 
   @Test
   @Order(2)
-  public void readOutOfDatabase() throws SQLException {
+  public void filterMoodEntries_ReturnListOfAllEntriesInTimeSpan() throws SQLException {
     long currentTime = System.currentTimeMillis() / 1000L;
     float hours = (int) Math.round(Math.random() * 10 + 1);
     long randomTime = (long) (currentTime - (hours * 60 * 60));
+    ArrayList<MoodEntry> expected = new ArrayList<>();
 
-    ArrayList<MoodEntry> actualFilteredValues = databaseConnection.fetchMoodEntries(hours);
-    ArrayList<MoodEntry> expectedFilteredValues = new ArrayList<>();
-    {
-      ArrayList<MoodEntry> dbAllValues = databaseConnection.fetchAllMoodEntries();
-      for (MoodEntry moodEntry : dbAllValues) {
-        if (moodEntry.time <= currentTime && moodEntry.time >= randomTime) {
-          expectedFilteredValues.add(moodEntry);
-        }
+    for (MoodEntry testData : generateMoodEntryTestData(10000)) {
+      databaseConnection.writeMoodEntry(testData);
+      if (testData.time <= currentTime && testData.time >= randomTime) {
+        expected.add(testData);
       }
     }
 
-    assertEquals(actualFilteredValues.size(), expectedFilteredValues.size());
-    for (int i = 0; i < actualFilteredValues.size(); i++) {
-      assertTrue(expectedFilteredValues.get(i).checkEquals(actualFilteredValues.get(i)));
+    ArrayList<MoodEntry> actual = databaseConnection.fetchMoodEntries(hours);
+
+    assertEquals(actual.size(), expected.size());
+    for (int i = 0; i < actual.size(); i++) {
+      assertTrue(expected.get(i).checkEquals(actual.get(i)));
     }
   }
 
   @Test
-  public void SingletonObjectCreation() throws IOException, SQLException {
+  public void singletonDatabase_ReturnSameObjectID() throws IOException, SQLException {
     DatabaseConnection newInstance = DatabaseConnection.getInstance();
     assertEquals(newInstance, databaseConnection);
+  }
+
+  private ArrayList<MoodEntry> generateMoodEntryTestData(int amount) {
+    ArrayList<MoodEntry> testData = new ArrayList<>();
+    for (int i = 0; i < amount; i++) {
+      testData.add(
+          new MoodEntry(
+              null,
+              (int) Math.round(Math.random() * 10),
+              (System.currentTimeMillis() / 1000) - Math.round(Math.random() * 10)));
+    }
+
+    return testData;
+  }
+
+  @AfterEach
+  void deleteData() throws SQLException {
+    StringBuilder sql = new StringBuilder();
+    Connection connection = databaseConnection.getActiveDatabaseConnection();
+    Statement st = connection.createStatement();
+
+    sql.append("DELETE ")
+        .append("FROM ")
+        .append(DatabaseConnection.getDatabaseProps().getProperty("table.moodMeter"));
+    System.out.println(sql);
+    st.executeUpdate(sql.toString());
   }
 }

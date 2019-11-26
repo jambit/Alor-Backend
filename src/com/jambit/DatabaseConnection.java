@@ -11,11 +11,20 @@ public class DatabaseConnection {
 
   private static DatabaseConnection databaseInstance = null;
   private static String PROPERTY_PATH = ("config/app.properties");
+
   private static Properties databaseProps = new Properties();
 
   private Connection activeDatabaseConnection;
 
   private DatabaseConnection() {}
+
+  public Connection getActiveDatabaseConnection() {
+    return activeDatabaseConnection;
+  }
+
+  public static Properties getDatabaseProps() {
+    return databaseProps;
+  }
 
   public static DatabaseConnection getInstance() throws IOException, SQLException {
     if (databaseInstance == null) {
@@ -52,7 +61,7 @@ public class DatabaseConnection {
   /**
    * This function returns mood entries with a chosen timespan.
    *
-   * @param hours Sets size of timestamp
+   * @param hours the time between now and the past
    * @return An ArrayList with all entries in the chosen timespan
    */
   public ArrayList<MoodEntry> fetchMoodEntries(Float hours) throws SQLException {
@@ -78,7 +87,7 @@ public class DatabaseConnection {
         .append(databaseProps.getProperty("table.moodMeter.id"))
         .append(" ASC");
 
-    return moodMeterSQLQuery(query.toString());
+    return fetchMoodMeterEntriesSQL(query.toString());
   }
 
   /**
@@ -96,7 +105,7 @@ public class DatabaseConnection {
    * @param sql SQL command you would like to use
    * @return returns ArrayList with moodMeter entries
    */
-  private ArrayList<MoodEntry> moodMeterSQLQuery(String sql) throws SQLException {
+  private ArrayList<MoodEntry> fetchMoodMeterEntriesSQL(String sql) throws SQLException {
     ArrayList<MoodEntry> entries = new ArrayList<>();
     Statement st = activeDatabaseConnection.createStatement();
     ResultSet rs = st.executeQuery(sql);
