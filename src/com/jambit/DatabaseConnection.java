@@ -108,6 +108,22 @@ public class DatabaseConnection {
   }
 
   /**
+   * This function returns all mood entries form the database.
+   *
+   * @return An ArrayList with all entries.
+   */
+  public MoodEntry fetchMoodEntryByID(int id) throws SQLException {
+    StringBuilder sql = new StringBuilder();
+    sql.append("SELECT * FROM ")
+        .append(databaseProps.getProperty("table.moodMeter"))
+        .append(" WHERE ")
+        .append(databaseProps.getProperty("table.moodMeter.id"))
+        .append("=")
+        .append(id);
+    moodMeterSQLQuery(sql);
+  }
+
+  /**
    * Execute SQL command on the database for the moodMeter
    *
    * @param sql SQL command you would like to use

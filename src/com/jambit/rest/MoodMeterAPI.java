@@ -1,5 +1,7 @@
 package com.jambit.rest;
 
+import com.jambit.DatabaseConnection;
+import com.jambit.domain.MoodEntry;
 import com.jambit.services.moodmeter.MoodMeterAverageService;
 import com.jambit.services.moodmeter.MoodMeterDistributionService;
 import java.io.IOException;
@@ -24,7 +26,7 @@ public class MoodMeterAPI {
   @GET
   @Path("distro")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getDistribution(@DefaultValue("4") @QueryParam("t") String time) {
+  public Response getDistribution(@DefaultValue("4") @QueryParam("t") String time) throws SQLException {
     MoodMeterDistributionService moodMeterDistributionService =
         MoodMeterDistributionService.getInstance();
     moodMeterDistributionService.setTime(Float.parseFloat(time));
@@ -33,10 +35,12 @@ public class MoodMeterAPI {
 
   @POST
   @Path("create")
-  @Consumes(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.TEXT_PLAIN)
   @Produces(MediaType.APPLICATION_JSON)
-  public Response returnData(String track) {
-    String result = track;
+  public Response returnData(String vote) throws SQLException {
+    DatabaseConnection db = DatabaseConnection.getInstance();
+    new
+
     return Response.status(201).entity(result).build();
   }
 }

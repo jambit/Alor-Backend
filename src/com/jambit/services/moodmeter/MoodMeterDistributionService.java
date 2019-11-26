@@ -1,7 +1,9 @@
 package com.jambit.services.moodmeter;
 
+import com.jambit.DatabaseConnection;
 import com.jambit.domain.MoodEntry;
 import com.jambit.services.Service;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class MoodMeterDistributionService implements Service {
@@ -11,8 +13,9 @@ public class MoodMeterDistributionService implements Service {
 
   private MoodMeterDistributionService() {}
 
-  public Object run() {
-    return getDistribution(new ArrayList<MoodEntry>());
+  public Object run() throws SQLException {
+    DatabaseConnection db = DatabaseConnection.getInstance();
+    return getDistribution(db.fetchMoodEntries(time));
   }
 
   public static MoodMeterDistributionService getInstance() {
