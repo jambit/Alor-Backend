@@ -104,6 +104,23 @@ public class DatabaseConnection {
   }
 
   /**
+   * Get MoodEntry with a specific ID
+   *
+   * @param id Key to search for
+   * @return Returns object with all information of the entry
+   */
+  private MoodEntry fetchMoodEntryByID(int id) throws SQLException {
+    StringBuilder sql = new StringBuilder();
+    sql.append("SELECT * FROM ")
+        .append(databaseProps.getProperty("table.moodMeter"))
+        .append(" WHERE ")
+        .append(databaseProps.getProperty("table.moodMeter.id"))
+        .append("=")
+        .append(id);
+    return fetchMoodMeterEntriesSQL(sql.toString()).get(0);
+  }
+
+  /**
    * Execute SQL command on the database for the moodMeter
    *
    * @param sql SQL command you would like to use
@@ -130,6 +147,7 @@ public class DatabaseConnection {
    * @param input The object to use for the entry
    */
   public MoodEntry writeMoodEntry(MoodEntry input) throws SQLException {
+    MoodEntry output = null;
     input.time = getCurrentTimeInSeconds();
     StringBuilder query =
         new StringBuilder()
@@ -150,11 +168,16 @@ public class DatabaseConnection {
     st.executeUpdate(query.toString(), Statement.RETURN_GENERATED_KEYS);
 
     ResultSet rs = st.getGeneratedKeys();
+
+    Integer objectID = null;
     if (rs.next()) {
-      input.id = rs.getInt(1);
+      objectID = rs.getInt(1);
+    }
+    if (objectID != null && fetchMoodEntryByID(objectID).checkEquals(input)) {
+      output = input;
     }
 
-    return input;
+    return output;
   }
 
   /**

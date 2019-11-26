@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.jambit.domain.MoodEntry;
 import java.io.IOException;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -29,8 +30,9 @@ class DatabaseConnectionTest {
   public void writeMoodEntry_Persist_ReturnSingleEntry() throws SQLException {
     MoodEntry expected = generateMoodEntryTestData(1).get(0);
     databaseConnection.writeMoodEntry(expected);
-    MoodEntry actual = databaseConnection.fetchAllMoodEntries().get(0);
-    assertTrue(actual.checkEquals(expected));
+    ArrayList<MoodEntry> actual = databaseConnection.fetchAllMoodEntries();
+    assertEquals(1,actual.size());
+    assertTrue(actual.get(0).checkEquals(expected));
   }
 
   @Test
@@ -41,10 +43,10 @@ class DatabaseConnectionTest {
     long randomTime = (long) (currentTime - (hours * 60 * 60));
     ArrayList<MoodEntry> expected = new ArrayList<>();
 
-    for (MoodEntry testData : generateMoodEntryTestData(10000)) {
-      databaseConnection.writeMoodEntry(testData);
-      if (testData.time <= currentTime && testData.time >= randomTime) {
-        expected.add(testData);
+    for (MoodEntry moodEntry : generateMoodEntryTestData(100)) {
+      databaseConnection.writeMoodEntry(moodEntry);
+      if (moodEntry.time <= currentTime && moodEntry.time >= randomTime) {
+        expected.add(moodEntry);
       }
     }
 
