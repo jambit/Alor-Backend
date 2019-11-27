@@ -2,19 +2,18 @@ package com.jambit.services.moodmeter;
 
 import com.jambit.DatabaseConnection;
 import com.jambit.domain.MoodEntry;
-import com.jambit.services.Service;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class MoodMeterAverageService implements Service {
+public class MoodMeterAverageService {
 
   private float time = 0;
   private static MoodMeterAverageService instance = null;
 
   private MoodMeterAverageService() {}
 
-  public Object run() throws IOException, SQLException {
+  public Float run() throws IOException, SQLException {
     DatabaseConnection db = DatabaseConnection.getInstance();
     return calculateMoodAverage(db.fetchMoodEntries(time));
   }

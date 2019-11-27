@@ -14,23 +14,23 @@ public class DatabaseConnection {
   private static String PROPERTY_PATH = ("appTest.properties");
   private static Properties databaseProps = new Properties();
 
-  private Connection activeDatabaseConnection;
+  private static Connection activeDatabaseConnection;
 
   private DatabaseConnection() {}
 
   public static DatabaseConnection getInstance() throws SQLException {
     File file = new File("file.txt");
-    System.out.println(System.getProperty("catalina.base"));
     try {
       databaseProps.load(new FileInputStream(PROPERTY_PATH));
 
     } catch (IOException e) {
       e.printStackTrace();
     }
-    if (databaseInstance == null) {
+    if (databaseInstance == null || activeDatabaseConnection.isValid(2)) {
       databaseInstance = new DatabaseConnection();
+      databaseInstance.connect();
+    } else {
     }
-    databaseInstance.connect();
     return databaseInstance;
   }
 
@@ -58,8 +58,6 @@ public class DatabaseConnection {
             connectionLink.toString(),
             databaseProps.getProperty("database.username"),
             databaseProps.getProperty("database.password"));
-
-    System.out.println("Connection successful!!!");
   }
 
   /**
@@ -120,7 +118,7 @@ public class DatabaseConnection {
         .append(databaseProps.getProperty("table.moodMeter.id"))
         .append("=")
         .append(id);
-    moodMeterSQLQuery(sql);
+    return moodMeterSQLQuery(sql.toString()).get(0);
   }
 
   /**
@@ -149,7 +147,8 @@ public class DatabaseConnection {
    *
    * @param input The object to use for the entry
    */
-  public void writeMoodEntry(MoodEntry input) throws SQLException {
+  public MoodEntry writeMoodEntry(MoodEntry input) throws SQLException {
+    input.time = getCurrentTimeInSeconds();
     StringBuilder query =
         new StringBuilder()
             .append("INSERT INTO ")
@@ -166,7 +165,15 @@ public class DatabaseConnection {
             .append(")");
 
     Statement st = activeDatabaseConnection.createStatement();
-    st.executeUpdate(query.toString());
+    st.executeUpdate(query.toString(), Statement.RETURN_GENERATED_KEYS);
+
+    ResultSet rs = st.getGeneratedKeys();
+    int generatedKey = 0;
+    if (rs.next()) {
+      generatedKey = rs.getInt(1);
+    }
+    input.id = generatedKey;
+    return input;
   }
 
   /**

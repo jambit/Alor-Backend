@@ -20,13 +20,15 @@ public class MoodMeterAPI {
       throws IOException, SQLException {
     MoodMeterAverageService moodMeterAverageService = MoodMeterAverageService.getInstance();
     moodMeterAverageService.setTime(Float.parseFloat(time));
-    return Response.status(200).entity(moodMeterAverageService.run()).build();
+    Float data = moodMeterAverageService.run();
+    return Response.status(200).entity(data).build();
   }
 
   @GET
   @Path("distro")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getDistribution(@DefaultValue("4") @QueryParam("t") String time) throws SQLException {
+  public Response getDistribution(@DefaultValue("4") @QueryParam("t") String time)
+      throws SQLException {
     MoodMeterDistributionService moodMeterDistributionService =
         MoodMeterDistributionService.getInstance();
     moodMeterDistributionService.setTime(Float.parseFloat(time));
@@ -39,8 +41,8 @@ public class MoodMeterAPI {
   @Produces(MediaType.APPLICATION_JSON)
   public Response returnData(String vote) throws SQLException {
     DatabaseConnection db = DatabaseConnection.getInstance();
-    new
-
-    return Response.status(201).entity(result).build();
+    MoodEntry input = db.writeMoodEntry(new MoodEntry(0, Integer.parseInt(vote), 123));
+    System.out.println("New Vote: " + input.vote);
+    return Response.status(201).entity(input).build();
   }
 }
