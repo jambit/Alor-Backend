@@ -9,11 +9,11 @@ import java.util.Properties;
 
 public class DatabaseConnection {
 
-  public static final String CATALINA_HOME_PATH =
+  public static String CATALINA_HOME_PATH =
       System.getenv("CATALINA_HOME") + "\\webapps\\alorwebapp\\";
 
   private static DatabaseConnection databaseInstance = null;
-  private static String PROPERTY_PATH = CATALINA_HOME_PATH + "config/app.properties";
+  private static String PROPERTY_PATH = CATALINA_HOME_PATH + "appTest.properties";
   private static Properties databaseProps = new Properties();
 
   private Connection activeDatabaseConnection;
@@ -29,6 +29,9 @@ public class DatabaseConnection {
   }
 
   public static DatabaseConnection getInstance() throws IOException, SQLException {
+    if (System.getenv("CATALINA_HOME") == null) {
+      CATALINA_HOME_PATH = "";
+    }
     if (databaseInstance == null) {
       databaseInstance = new DatabaseConnection();
       databaseInstance.connect();
@@ -41,7 +44,7 @@ public class DatabaseConnection {
     databaseProps.load(new FileInputStream(PROPERTY_PATH));
 
     try {
-      Class.forName("com.mysql.jdbc.Driver");
+      Class.forName("com.mysql.cj.jdbc.Driver");
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
@@ -176,8 +179,8 @@ public class DatabaseConnection {
     if (rs.next()) {
       objectID = rs.getInt(1);
     }
-    if (objectID != null && fetchMoodEntryByID(objectID).checkEquals(input)) {
-      output = input;
+    if (objectID != null) {
+      output = fetchMoodEntryByID(objectID);
     }
 
     return output;
@@ -198,7 +201,11 @@ public class DatabaseConnection {
    * @param path the file path to set it to
    */
   public static void setPropertyPath(String path) throws IOException {
-    PROPERTY_PATH = path;
+    if (System.getenv("CATALINA_HOME") == null) {
+      CATALINA_HOME_PATH = "";
+    }
+
+    PROPERTY_PATH = CATALINA_HOME_PATH + path;
     databaseProps.load(new FileInputStream(PROPERTY_PATH));
   }
 }

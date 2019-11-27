@@ -43,7 +43,7 @@ class DatabaseConnectionTest {
     ArrayList<MoodEntry> expected = new ArrayList<>();
 
     for (MoodEntry moodEntry : generateMoodEntryTestData(100)) {
-      databaseConnection.writeMoodEntry(moodEntry);
+      MoodEntry actual = databaseConnection.writeMoodEntry(moodEntry);
       if (moodEntry.time <= currentTime && moodEntry.time >= randomTime) {
         expected.add(moodEntry);
       }
@@ -51,7 +51,7 @@ class DatabaseConnectionTest {
 
     ArrayList<MoodEntry> actual = databaseConnection.fetchMoodEntries(hours);
 
-    assertEquals(actual.size(), expected.size());
+    assertEquals(expected.size(), actual.size());
     for (int i = 0; i < actual.size(); i++) {
       assertTrue(expected.get(i).checkEquals(actual.get(i)));
     }
@@ -70,7 +70,7 @@ class DatabaseConnectionTest {
           new MoodEntry(
               null,
               (int) Math.round(Math.random() * 10),
-              (System.currentTimeMillis() / 1000) - Math.round(Math.random() * 10)));
+              (System.currentTimeMillis() / 1000) - Math.round(Math.random() * 10 * 60 * 60)));
     }
 
     return testData;
