@@ -95,9 +95,9 @@ public class DatabaseConnection {
         .append(" ORDER BY ")
         .append(databaseProps.getProperty("table.moodMeter.id"))
         .append(" ASC");
-
-    System.out.println("[" + currentTime + "] " + query);
-    return fetchMoodMeterEntriesSQL(query.toString());
+    ArrayList<MoodEntry> output = fetchMoodMeterEntriesSQL(query.toString());
+    System.out.println("[" + currentTime + "] " + query + " | SIZE:" + output.size());
+    return output;
   }
 
   /**
