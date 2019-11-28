@@ -1,10 +1,9 @@
 package com.jambit.services.moodmeter;
 
-import com.jambit.domain.MoodEntries;
-import com.jambit.services.Service;
+import com.jambit.domain.MoodEntry;
 import java.util.ArrayList;
 
-public class MoodMeterAverageService implements Service {
+public class MoodMeterAverageService {
 
   private float time = 0;
   private static MoodMeterAverageService instance = null;
@@ -12,7 +11,7 @@ public class MoodMeterAverageService implements Service {
   private MoodMeterAverageService() {}
 
   public Object run() {
-    return calculateMoodAverage(new ArrayList<MoodEntries>());
+    return calculateMoodAverage(new ArrayList<MoodEntry>());
   }
 
   public static MoodMeterAverageService getInstance() {
@@ -22,7 +21,7 @@ public class MoodMeterAverageService implements Service {
     return instance;
   }
 
-  private float calculateMoodAverage(ArrayList<MoodEntries> moodEntries) {
+  private float calculateMoodAverage(ArrayList<MoodEntry> moodEntries) {
     float entryCount = moodEntries.size();
     float entrySumm = 0;
     for (int i = 0; i < entryCount; i++) {

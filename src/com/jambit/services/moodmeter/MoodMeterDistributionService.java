@@ -1,18 +1,22 @@
 package com.jambit.services.moodmeter;
 
-import com.jambit.domain.MoodEntries;
-import com.jambit.services.Service;
+import com.jambit.DatabaseConnection;
+import com.jambit.domain.MoodEntry;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class MoodMeterDistributionService implements Service {
+public class MoodMeterDistributionService {
 
   private float time = 0;
   private static MoodMeterDistributionService instance = null;
 
   private MoodMeterDistributionService() {}
 
-  public Object run() {
-    return getDistribution(new ArrayList<MoodEntries>());
+  public int[] run() throws IOException, SQLException {
+    DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
+
+    return getDistribution(databaseConnection.fetchMoodEntries(time));
   }
 
   public static MoodMeterDistributionService getInstance() {
@@ -22,9 +26,9 @@ public class MoodMeterDistributionService implements Service {
     return instance;
   }
 
-  private int[] getDistribution(ArrayList<MoodEntries> moodEntries) {
+  private int[] getDistribution(ArrayList<MoodEntry> moodEntries) {
     int[] distro = new int[10];
-    for (MoodEntries moodEntry : moodEntries) {
+    for (MoodEntry moodEntry : moodEntries) {
       if (moodEntry.vote > 0 && moodEntry.vote <= 10) {
         distro[moodEntry.vote - 1]++;
       }

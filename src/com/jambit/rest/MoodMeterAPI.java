@@ -2,6 +2,8 @@ package com.jambit.rest;
 
 import com.jambit.services.moodmeter.MoodMeterAverageService;
 import com.jambit.services.moodmeter.MoodMeterDistributionService;
+import java.io.IOException;
+import java.sql.SQLException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -25,7 +27,13 @@ public class MoodMeterAPI {
     MoodMeterDistributionService moodMeterDistributionService =
         MoodMeterDistributionService.getInstance();
     moodMeterDistributionService.setTime(Float.parseFloat(time));
-    return Response.status(200).entity(moodMeterDistributionService.run()).build();
+
+    try {
+      return Response.status(200).entity(moodMeterDistributionService.run()).build();
+    } catch (IOException | SQLException e) {
+      e.printStackTrace();
+      return Response.status(404).entity(e).build();
+    }
   }
 
   @POST
