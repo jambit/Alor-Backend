@@ -16,12 +16,23 @@ public class DatabaseConnection {
   private static String PROPERTY_PATH = CATALINA_HOME_PATH + "appTest.properties";
   private static Properties databaseProps = new Properties();
 
+  private static databaseDrivers databaseDriver = databaseDrivers.mysql;
+
   private Connection activeDatabaseConnection;
+
+  enum databaseDrivers {
+    mysql,
+    h2
+  }
 
   private DatabaseConnection() {}
 
   public Connection getActiveDatabaseConnection() {
     return activeDatabaseConnection;
+  }
+
+  public static void setDatabaseDriver(databaseDrivers driver) {
+    databaseDriver = driver;
   }
 
   public static Properties getDatabaseProps() {
@@ -49,14 +60,21 @@ public class DatabaseConnection {
       e.printStackTrace();
     }
 
-    StringBuilder connectionLink =
-        new StringBuilder()
-            .append("jdbc:mysql://")
-            .append(databaseProps.getProperty("database.hostIP"))
-            .append(":")
-            .append(databaseProps.getProperty("database.port"))
-            .append("/")
-            .append(databaseProps.getProperty("database.databaseName"));
+    if (databaseProps.getProperty("h2.active").equals("true")) {
+      databaseDriver = databaseDrivers.h2;
+    }
+
+    StringBuilder connectionLink = new StringBuilder();
+    if (databaseDriver == databaseDrivers.mysql) {
+      connectionLink.append("jdbc:mysql://");
+    } else if (databaseDriver == databaseDrivers.h2) {
+      connectionLink.append("jdbc:h2:");
+    }
+    connectionLink.append(databaseProps.getProperty("database.hostIP"));
+    if (databaseProps.getProperty("database.port").equals("")) {
+      connectionLink.append(":").append(databaseProps.getProperty("database.port"));
+    }
+    connectionLink.append("/").append(databaseProps.getProperty("database.databaseName"));
 
     System.out.println("Connecting to \"" + connectionLink + "\"");
 

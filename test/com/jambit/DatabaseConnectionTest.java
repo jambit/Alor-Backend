@@ -22,7 +22,20 @@ class DatabaseConnectionTest {
   @BeforeAll
   static void init() throws IOException, SQLException {
     DatabaseConnection.setPropertyPath("config/appTest.properties");
+    DatabaseConnection.setDatabaseDriver(DatabaseConnection.databaseDrivers.h2);
     databaseConnection = DatabaseConnection.getInstance();
+
+    StringBuilder sql =
+        new StringBuilder()
+            .append(
+                "CREATE TABLE MoodMeter "
+                    + "( ID INT NOT NULL auto_increment,"
+                    + " Time INT NOT NULL,"
+                    + " Vote INT NOT NULL"
+                    + ");");
+
+    Statement st = databaseConnection.getActiveDatabaseConnection().createStatement();
+    st.executeUpdate(sql.toString());
   }
 
   @Test
@@ -90,5 +103,13 @@ class DatabaseConnectionTest {
         .append(DatabaseConnection.getDatabaseProps().getProperty("table.moodMeter"));
     System.out.println(sql);
     st.executeUpdate(sql.toString());
+  }
+
+  @AfterAll
+  static void close() throws SQLException {
+    databaseConnection
+        .getActiveDatabaseConnection()
+        .createStatement()
+        .executeUpdate("DROP TABLE MoodMeter;");
   }
 }
