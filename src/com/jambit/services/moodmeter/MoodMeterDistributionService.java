@@ -29,8 +29,8 @@ public class MoodMeterDistributionService {
   private int[] getDistribution(ArrayList<MoodEntry> moodEntries) {
     int[] distro = new int[10];
     for (MoodEntry moodEntry : moodEntries) {
-      if (moodEntry.vote > 0 && moodEntry.vote <= 10) {
-        distro[moodEntry.vote - 1]++;
+      if (moodEntry.getVote() > 0 && moodEntry.getVote() <= 10) {
+        distro[moodEntry.getVote() - 1]++;
       }
     }
     return distro;
