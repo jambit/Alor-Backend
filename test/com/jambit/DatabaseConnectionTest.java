@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.*;
 
@@ -44,6 +46,9 @@ class DatabaseConnectionTest {
     MoodEntry expected = generateMoodEntryTestData(1).get(0);
     databaseConnection.writeMoodEntry(expected);
     ArrayList<MoodEntry> actual = databaseConnection.fetchAllMoodEntries();
+    for (String x : getPropertyContaining("table.")) {
+      System.out.println(x);
+    }
     assertEquals(1, actual.size());
     assertTrue(actual.get(0).checkEquals(expected));
   }
@@ -111,5 +116,19 @@ class DatabaseConnectionTest {
         .getActiveDatabaseConnection()
         .createStatement()
         .executeUpdate("DROP TABLE MoodMeter;");
+  }
+
+  ArrayList<String> getPropertyContaining(String input) {
+    String props = DatabaseConnection.getDatabaseProps().keySet().toString();
+    props = props.replace("[", "").replace("]", "");
+    String[] propList = props.split(",");
+    List<String> propArrayList = Arrays.asList(propList);
+    ArrayList<String> output = new ArrayList<>();
+    for (String y : propArrayList) {
+      if (y.contains(input)) {
+        output.add(y);
+      }
+    }
+    return output;
   }
 }
