@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.jambit.domain.MoodEntry;
 import java.io.IOException;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -31,7 +30,7 @@ class DatabaseConnectionTest {
     MoodEntry expected = generateMoodEntryTestData(1).get(0);
     databaseConnection.writeMoodEntry(expected);
     ArrayList<MoodEntry> actual = databaseConnection.fetchAllMoodEntries();
-    assertEquals(1,actual.size());
+    assertEquals(1, actual.size());
     assertTrue(actual.get(0).checkEquals(expected));
   }
 
