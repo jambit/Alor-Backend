@@ -1,5 +1,7 @@
 package com.jambit.rest;
 
+import com.jambit.DatabaseConnection;
+import com.jambit.domain.MoodEntry;
 import com.jambit.services.moodmeter.MoodMeterAverageService;
 import com.jambit.services.moodmeter.MoodMeterDistributionService;
 import java.io.IOException;
@@ -38,10 +40,11 @@ public class MoodMeterAPI {
 
   @POST
   @Path("create")
-  @Consumes(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.TEXT_PLAIN)
   @Produces(MediaType.APPLICATION_JSON)
-  public Response returnData(String track) {
-    String result = track;
+  public Response returnData(String vote) throws IOException, SQLException {
+    MoodEntry write = new MoodEntry(null, Integer.parseInt(vote), null);
+    MoodEntry result = DatabaseConnection.getInstance().writeMoodEntry(write);
     return Response.status(201).entity(result).build();
   }
 }
