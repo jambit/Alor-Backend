@@ -10,11 +10,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import org.junit.jupiter.api.*;
 
-/*
-TODO:
-   - Implement H2 (optional)
- */
-
 class DatabaseConnectionTest {
   private static DatabaseConnection databaseConnection;
 
@@ -44,7 +39,7 @@ class DatabaseConnectionTest {
 
     for (MoodEntry moodEntry : generateMoodEntryTestData(100)) {
       databaseConnection.writeMoodEntry(moodEntry);
-      if (moodEntry.time <= currentTime && moodEntry.time >= randomTime) {
+      if (moodEntry.getTime() <= currentTime && moodEntry.getTime() >= randomTime) {
         expected.add(moodEntry);
       }
     }
@@ -66,11 +61,9 @@ class DatabaseConnectionTest {
   private ArrayList<MoodEntry> generateMoodEntryTestData(int amount) {
     ArrayList<MoodEntry> testData = new ArrayList<>();
     for (int i = 0; i < amount; i++) {
-      testData.add(
-          new MoodEntry(
-              null,
-              (int) Math.round(Math.random() * 10),
-              (System.currentTimeMillis() / 1000) - Math.round(Math.random() * 10)));
+      MoodEntry input = new MoodEntry((int) Math.round(Math.random() * 10));
+      input.setTime((System.currentTimeMillis() / 1000) - Math.round(Math.random() * 10));
+      testData.add(input);
     }
 
     return testData;

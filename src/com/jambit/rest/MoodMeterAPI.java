@@ -42,8 +42,13 @@ public class MoodMeterAPI {
   @Path("create")
   @Consumes(MediaType.TEXT_PLAIN)
   @Produces(MediaType.APPLICATION_JSON)
-  public Response returnData(String vote) throws IOException, SQLException {
-    MoodEntry write = new MoodEntry(null, Integer.parseInt(vote), null);
+  public Response createMoodEntry(String vote) throws IOException, SQLException {
+    MoodEntry write;
+    try {
+      write = new MoodEntry(Integer.parseInt(vote));
+    } catch (NumberFormatException e) {
+      return Response.status(422).entity(e.getMessage()).build();
+    }
     MoodEntry result = DatabaseConnection.getInstance().writeMoodEntry(write);
     return Response.status(201).entity(result).build();
   }

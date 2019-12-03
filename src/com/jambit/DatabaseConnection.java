@@ -131,11 +131,11 @@ public class DatabaseConnection {
     Statement st = activeDatabaseConnection.createStatement();
     ResultSet rs = st.executeQuery(sql);
     while (rs.next()) {
-      entries.add(
-          new MoodEntry(
-              rs.getInt(databaseProps.getProperty("table.moodMeter.id")),
-              rs.getInt(databaseProps.getProperty("table.moodMeter.entry")),
-              rs.getLong(databaseProps.getProperty("table.moodMeter.time"))));
+      MoodEntry output =
+          new MoodEntry(rs.getInt(databaseProps.getProperty("table.moodMeter.entry")));
+      output.setId(rs.getInt(databaseProps.getProperty("table.moodMeter.id")));
+      output.setTime(rs.getLong(databaseProps.getProperty("table.moodMeter.time")));
+      entries.add(output);
     }
 
     return entries;
@@ -148,7 +148,7 @@ public class DatabaseConnection {
    */
   public MoodEntry writeMoodEntry(MoodEntry input) throws SQLException {
     MoodEntry output = null;
-    input.time = getCurrentTimeInSeconds();
+    input.setTime(getCurrentTimeInSeconds());
     StringBuilder query =
         new StringBuilder()
             .append("INSERT INTO ")
@@ -159,9 +159,9 @@ public class DatabaseConnection {
             .append(databaseProps.getProperty("table.moodMeter.time"))
             .append(")")
             .append(" VALUES (")
-            .append(input.vote)
+            .append(input.getVote())
             .append(",")
-            .append(input.time)
+            .append(input.getTime())
             .append(")");
 
     Statement st = activeDatabaseConnection.createStatement();

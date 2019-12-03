@@ -25,7 +25,7 @@ public class MoodMeterAverageService {
     float entryCount = moodEntries.size();
     float entrySumm = 0;
     for (int i = 0; i < entryCount; i++) {
-      entrySumm += moodEntries.get(i).vote;
+      entrySumm += moodEntries.get(i).getVote();
     }
     float average = (float) (Math.round((entrySumm / entryCount) * 100)) / 100;
     return average;
