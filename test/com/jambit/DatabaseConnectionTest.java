@@ -8,15 +8,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.*;
-
-/*
-TODO:
-   - Implement H2 (optional)
- */
 
 class DatabaseConnectionTest {
   private static DatabaseConnection databaseConnection;
@@ -63,7 +56,7 @@ class DatabaseConnectionTest {
     ArrayList<MoodEntry> expected = new ArrayList<>();
     for (int i = 0; i < 20; i++) {
       long randomTime = currentTime - ((random.nextInt((int) time) + 1) * 60 * 60);
-      MoodEntry moodEntry = new MoodEntry(null, 5, currentTime - randomTime);
+      MoodEntry moodEntry = new MoodEntry(5);
       moodEntry = databaseConnection.writeMoodEntry(moodEntry);
       if (randomTime >= currentTime - (time * 60 * 60)) {
         expected.add(moodEntry);
@@ -87,11 +80,9 @@ class DatabaseConnectionTest {
   private ArrayList<MoodEntry> generateMoodEntryTestData(int amount) {
     ArrayList<MoodEntry> testData = new ArrayList<>();
     for (int i = 0; i < amount; i++) {
-      testData.add(
-          new MoodEntry(
-              null,
-              (int) Math.round(Math.random() * 10),
-              (System.currentTimeMillis() / 1000) - Math.round(Math.random() * 10) * 60 * 60));
+      MoodEntry input = new MoodEntry((int) Math.round(Math.random() * 10));
+      input.setTime((System.currentTimeMillis() / 1000) - Math.round(Math.random() * 10 * 60 * 60));
+      testData.add(input);
     }
 
     return testData;
