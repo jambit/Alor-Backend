@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.*;
 
@@ -67,7 +69,7 @@ class DatabaseConnectionTest {
 
     assertEquals(expected.size(), actual.size());
     for (int i = 0; i < actual.size(); i++) {
-      assertEquals(expected.get(i).id, actual.get(i).id);
+      assertEquals(expected.get(i).getId(), actual.get(i).getId());
     }
   }
 
