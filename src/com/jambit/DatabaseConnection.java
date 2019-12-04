@@ -38,7 +38,7 @@ public class DatabaseConnection {
     databaseProps.load(new FileInputStream(PROPERTY_PATH));
 
     try {
-      Class.forName("com.mysql.jdbc.Driver");
+      Class.forName("com.mysql.cj.jdbc.Driver");
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
