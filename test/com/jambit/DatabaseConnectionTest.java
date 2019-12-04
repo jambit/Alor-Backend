@@ -18,8 +18,7 @@ class DatabaseConnectionTest {
 
   @BeforeAll
   static void init() throws IOException, SQLException {
-    DatabaseConnection.setPropertyPath("config/appTest.properties");
-    DatabaseConnection.setDatabaseDriver(DatabaseConnection.databaseDrivers.mysql);
+    DatabaseConnection.setPropertyPath("config/app.properties");
     databaseConnection = DatabaseConnection.getInstance();
 
     if (DatabaseConnection.getDatabaseDriver() == DatabaseConnection.databaseDrivers.h2) {

@@ -75,7 +75,8 @@ public class DatabaseConnection {
       connectionLink.append("jdbc:h2:");
     }
     connectionLink.append(databaseProps.getProperty("database.hostIP"));
-    if (!databaseProps.getProperty("database.port").equals("")) {
+    if (!databaseProps.getProperty("database.port").equals("")
+        && databaseDriver != databaseDrivers.h2) {
       connectionLink.append(":").append(databaseProps.getProperty("database.port"));
     }
     connectionLink.append("/").append(databaseProps.getProperty("database.databaseName"));
@@ -192,6 +193,7 @@ public class DatabaseConnection {
             .append(input.getTime())
             .append(")");
 
+    System.out.println(query);
     Statement st = activeDatabaseConnection.createStatement();
     st.executeUpdate(query.toString(), Statement.RETURN_GENERATED_KEYS);
 
@@ -229,5 +231,10 @@ public class DatabaseConnection {
 
     PROPERTY_PATH = CATALINA_HOME_PATH + path;
     databaseProps.load(new FileInputStream(PROPERTY_PATH));
+
+    if (DatabaseConnection.getDatabaseProps().getProperty("h2.active").equals("true")) {
+      DatabaseConnection.setDatabaseDriver(DatabaseConnection.databaseDrivers.h2);
+      System.out.println("H2 is active");
+    }
   }
 }
