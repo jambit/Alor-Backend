@@ -35,6 +35,10 @@ public class DatabaseConnection {
     databaseDriver = driver;
   }
 
+  public static databaseDrivers getDatabaseDriver() {
+    return databaseDriver;
+  }
+
   public static Properties getDatabaseProps() {
     return databaseProps;
   }
@@ -71,7 +75,7 @@ public class DatabaseConnection {
       connectionLink.append("jdbc:h2:");
     }
     connectionLink.append(databaseProps.getProperty("database.hostIP"));
-    if (databaseProps.getProperty("database.port").equals("")) {
+    if (!databaseProps.getProperty("database.port").equals("")) {
       connectionLink.append(":").append(databaseProps.getProperty("database.port"));
     }
     connectionLink.append("/").append(databaseProps.getProperty("database.databaseName"));

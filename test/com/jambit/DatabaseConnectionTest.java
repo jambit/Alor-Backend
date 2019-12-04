@@ -19,20 +19,23 @@ class DatabaseConnectionTest {
   @BeforeAll
   static void init() throws IOException, SQLException {
     DatabaseConnection.setPropertyPath("config/appTest.properties");
-    DatabaseConnection.setDatabaseDriver(DatabaseConnection.databaseDrivers.h2);
+    DatabaseConnection.setDatabaseDriver(DatabaseConnection.databaseDrivers.mysql);
     databaseConnection = DatabaseConnection.getInstance();
 
-    StringBuilder sql =
-        new StringBuilder()
-            .append(
-                "CREATE TABLE MoodMeter "
-                    + "( ID INT NOT NULL auto_increment,"
-                    + " Time INT NOT NULL,"
-                    + " Vote INT NOT NULL"
-                    + ");");
-
-    Statement st = databaseConnection.getActiveDatabaseConnection().createStatement();
-    st.executeUpdate(sql.toString());
+    if (DatabaseConnection.getDatabaseDriver() == DatabaseConnection.databaseDrivers.h2) {
+      StringBuilder sql =
+          new StringBuilder()
+              .append(
+                  "CREATE TABLE MoodMeter "
+                      + "( ID INT NOT NULL auto_increment,"
+                      + " Time INT NOT NULL,"
+                      + " Vote INT NOT NULL"
+                      + ");");
+      databaseConnection
+          .getActiveDatabaseConnection()
+          .createStatement()
+          .executeUpdate(sql.toString());
+    }
   }
 
   @Test
@@ -105,10 +108,12 @@ class DatabaseConnectionTest {
 
   @AfterAll
   static void close() throws SQLException {
-    databaseConnection
-        .getActiveDatabaseConnection()
-        .createStatement()
-        .executeUpdate("DROP TABLE MoodMeter;");
+    if (DatabaseConnection.getDatabaseDriver() == DatabaseConnection.databaseDrivers.h2) {
+      databaseConnection
+          .getActiveDatabaseConnection()
+          .createStatement()
+          .executeUpdate("DROP TABLE MoodMeter;");
+    }
   }
 
   ArrayList<String> getPropertyContaining(String input) {
