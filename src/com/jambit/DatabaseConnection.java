@@ -13,7 +13,7 @@ public class DatabaseConnection {
       System.getenv("CATALINA_HOME") + "\\webapps\\alorwebapp\\";
 
   private static DatabaseConnection databaseInstance = null;
-  private static String PROPERTY_PATH = CATALINA_HOME_PATH + "appTest.properties";
+  private static String PROPERTY_PATH = CATALINA_HOME_PATH + "app.properties";
   private static Properties databaseProps = new Properties();
 
   private static databaseDrivers databaseDriver = databaseDrivers.mysql;
@@ -56,6 +56,7 @@ public class DatabaseConnection {
 
   /** Connects to the database */
   private void connect() throws SQLException, IOException {
+    System.out.println(CATALINA_HOME_PATH);
     databaseProps.load(new FileInputStream(PROPERTY_PATH));
 
     /*tomcat requires to check class existence. Otherwise tomcat crashes.*/
