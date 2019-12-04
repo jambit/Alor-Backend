@@ -58,6 +58,7 @@ public class DatabaseConnection {
   private void connect() throws SQLException, IOException {
     databaseProps.load(new FileInputStream(PROPERTY_PATH));
 
+    /*tomcat requires to check class existence. Otherwise tomcat crashes.*/
     try {
       Class.forName("com.mysql.cj.jdbc.Driver");
     } catch (ClassNotFoundException e) {
@@ -72,7 +73,7 @@ public class DatabaseConnection {
     if (databaseDriver == databaseDrivers.mysql) {
       connectionLink.append("jdbc:mysql://");
     } else if (databaseDriver == databaseDrivers.h2) {
-      connectionLink.append("jdbc:h2:");
+      connectionLink.append("jdbc:h2:mem:");
     }
     connectionLink.append(databaseProps.getProperty("database.hostIP"));
     if (!databaseProps.getProperty("database.port").equals("")
@@ -118,9 +119,9 @@ public class DatabaseConnection {
         .append(" ORDER BY ")
         .append(databaseProps.getProperty("table.moodMeter.id"))
         .append(" ASC");
-    ArrayList<MoodEntry> output = fetchMoodMeterEntriesSQL(query.toString());
-    System.out.println("[" + currentTime + "] " + query + " | SIZE:" + output.size());
-    return output;
+    ArrayList<MoodEntry> moodMeterEntries = fetchMoodMeterEntriesSQL(query.toString());
+    System.out.println("[" + currentTime + "] " + query + " | SIZE:" + moodMeterEntries.size());
+    return moodMeterEntries;
   }
 
   /**
@@ -173,11 +174,11 @@ public class DatabaseConnection {
   /**
    * Write mood entries into the database
    *
-   * @param input The object to use for the entry
+   * @param moodMeterEntriesToPersist The object to use for the entry
    */
-  public MoodEntry writeMoodEntry(MoodEntry input) throws SQLException {
-    MoodEntry output = null;
-    input.setTime(getCurrentTimeInSeconds());
+  public MoodEntry writeMoodEntry(MoodEntry moodMeterEntriesToPersist) throws SQLException {
+    MoodEntry updatedMoodMeterEntry = null;
+    moodMeterEntriesToPersist.setTime(getCurrentTimeInSeconds());
     StringBuilder query =
         new StringBuilder()
             .append("INSERT INTO ")
@@ -188,9 +189,9 @@ public class DatabaseConnection {
             .append(databaseProps.getProperty("table.moodMeter.time"))
             .append(")")
             .append(" VALUES (")
-            .append(input.getVote())
+            .append(moodMeterEntriesToPersist.getVote())
             .append(",")
-            .append(input.getTime())
+            .append(moodMeterEntriesToPersist.getTime())
             .append(")");
 
     System.out.println(query);
@@ -204,10 +205,10 @@ public class DatabaseConnection {
       objectID = rs.getInt(1);
     }
     if (objectID != null) {
-      output = fetchMoodEntryByID(objectID);
+      updatedMoodMeterEntry = fetchMoodEntryByID(objectID);
     }
 
-    return output;
+    return updatedMoodMeterEntry;
   }
 
   /**
