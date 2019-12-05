@@ -9,8 +9,7 @@ import java.util.Properties;
 
 public class DatabaseConnection {
 
-  public static String CATALINA_HOME_PATH =
-      System.getenv("CATALINA_HOME") + "\\webapps\\alorwebapp\\";
+  public static String CATALINA_HOME_PATH = System.getenv("CATALINA_HOME") + "/webapps/alorwebapp/";
 
   private static DatabaseConnection databaseInstance = null;
   private static String PROPERTY_PATH = CATALINA_HOME_PATH + "app.properties";
