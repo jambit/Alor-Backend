@@ -61,7 +61,7 @@ public class DatabaseConnection {
 
     /*tomcat requires to check class existence. Otherwise tomcat crashes.*/
     try {
-      Class.forName("com.mysql.cj.jdbc.Driver");
+      Class.forName("com.mysql.jdbc.Driver");
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
