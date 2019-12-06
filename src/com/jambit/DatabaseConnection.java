@@ -9,11 +9,21 @@ import java.util.Properties;
 
 public class DatabaseConnection {
 
+  public static String CATALINA_HOME_PATH =
+      System.getenv("CATALINA_HOME") + "\\webapps\\alorwebapp\\";
+
   private static DatabaseConnection databaseInstance = null;
-  private static String PROPERTY_PATH = ("config/app.properties");
+  private static String PROPERTY_PATH = CATALINA_HOME_PATH + "appTest.properties";
   private static Properties databaseProps = new Properties();
 
+  private static databaseDrivers databaseDriver = databaseDrivers.mysql;
+
   private Connection activeDatabaseConnection;
+
+  enum databaseDrivers {
+    mysql,
+    h2
+  }
 
   private DatabaseConnection() {}
 
@@ -21,11 +31,22 @@ public class DatabaseConnection {
     return activeDatabaseConnection;
   }
 
+  public static void setDatabaseDriver(databaseDrivers driver) {
+    databaseDriver = driver;
+  }
+
+  public static databaseDrivers getDatabaseDriver() {
+    return databaseDriver;
+  }
+
   public static Properties getDatabaseProps() {
     return databaseProps;
   }
 
   public static DatabaseConnection getInstance() throws IOException, SQLException {
+    if (System.getenv("CATALINA_HOME") == null) {
+      CATALINA_HOME_PATH = "";
+    }
     if (databaseInstance == null) {
       databaseInstance = new DatabaseConnection();
       databaseInstance.connect();
@@ -37,20 +58,29 @@ public class DatabaseConnection {
   private void connect() throws SQLException, IOException {
     databaseProps.load(new FileInputStream(PROPERTY_PATH));
 
+    /*tomcat requires to check class existence. Otherwise tomcat crashes.*/
     try {
-      Class.forName("com.mysql.jdbc.Driver");
+      Class.forName("com.mysql.cj.jdbc.Driver");
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
 
-    StringBuilder connectionLink =
-        new StringBuilder()
-            .append("jdbc:mysql://")
-            .append(databaseProps.getProperty("database.hostIP"))
-            .append(":")
-            .append(databaseProps.getProperty("database.port"))
-            .append("/")
-            .append(databaseProps.getProperty("database.databaseName"));
+    if (databaseProps.getProperty("h2.active").equals("true")) {
+      databaseDriver = databaseDrivers.h2;
+    }
+
+    StringBuilder connectionLink = new StringBuilder();
+    if (databaseDriver == databaseDrivers.mysql) {
+      connectionLink.append("jdbc:mysql://");
+    } else if (databaseDriver == databaseDrivers.h2) {
+      connectionLink.append("jdbc:h2:mem:");
+    }
+    connectionLink.append(databaseProps.getProperty("database.hostIP"));
+    if (!databaseProps.getProperty("database.port").equals("")
+        && databaseDriver != databaseDrivers.h2) {
+      connectionLink.append(":").append(databaseProps.getProperty("database.port"));
+    }
+    connectionLink.append("/").append(databaseProps.getProperty("database.databaseName"));
 
     System.out.println("Connecting to \"" + connectionLink + "\"");
 
@@ -89,9 +119,9 @@ public class DatabaseConnection {
         .append(" ORDER BY ")
         .append(databaseProps.getProperty("table.moodMeter.id"))
         .append(" ASC");
-
-    System.out.println("[" + currentTime + "] " + query);
-    return fetchMoodMeterEntriesSQL(query.toString());
+    ArrayList<MoodEntry> moodMeterEntries = fetchMoodMeterEntriesSQL(query.toString());
+    System.out.println("[" + currentTime + "] " + query + " | SIZE:" + moodMeterEntries.size());
+    return moodMeterEntries;
   }
 
   /**
@@ -144,11 +174,11 @@ public class DatabaseConnection {
   /**
    * Write mood entries into the database
    *
-   * @param input The object to use for the entry
+   * @param moodMeterEntriesToPersist The object to use for the entry
    */
-  public MoodEntry writeMoodEntry(MoodEntry input) throws SQLException {
-    MoodEntry output = null;
-    input.setTime(getCurrentTimeInSeconds());
+  public MoodEntry writeMoodEntry(MoodEntry moodMeterEntriesToPersist) throws SQLException {
+    MoodEntry updatedMoodMeterEntry = null;
+    moodMeterEntriesToPersist.setTime(getCurrentTimeInSeconds());
     StringBuilder query =
         new StringBuilder()
             .append("INSERT INTO ")
@@ -159,11 +189,12 @@ public class DatabaseConnection {
             .append(databaseProps.getProperty("table.moodMeter.time"))
             .append(")")
             .append(" VALUES (")
-            .append(input.getVote())
+            .append(moodMeterEntriesToPersist.getVote())
             .append(",")
-            .append(input.getTime())
+            .append(moodMeterEntriesToPersist.getTime())
             .append(")");
 
+    System.out.println(query);
     Statement st = activeDatabaseConnection.createStatement();
     st.executeUpdate(query.toString(), Statement.RETURN_GENERATED_KEYS);
 
@@ -173,11 +204,11 @@ public class DatabaseConnection {
     if (rs.next()) {
       objectID = rs.getInt(1);
     }
-    if (objectID != null && fetchMoodEntryByID(objectID).checkEquals(input)) {
-      output = input;
+    if (objectID != null) {
+      updatedMoodMeterEntry = fetchMoodEntryByID(objectID);
     }
 
-    return output;
+    return updatedMoodMeterEntry;
   }
 
   /**
@@ -195,7 +226,16 @@ public class DatabaseConnection {
    * @param path the file path to set it to
    */
   public static void setPropertyPath(String path) throws IOException {
-    PROPERTY_PATH = path;
+    if (System.getenv("CATALINA_HOME") == null) {
+      CATALINA_HOME_PATH = "";
+    }
+
+    PROPERTY_PATH = CATALINA_HOME_PATH + path;
     databaseProps.load(new FileInputStream(PROPERTY_PATH));
+
+    if (DatabaseConnection.getDatabaseProps().getProperty("h2.active").equals("true")) {
+      DatabaseConnection.setDatabaseDriver(DatabaseConnection.databaseDrivers.h2);
+      System.out.println("H2 is active");
+    }
   }
 }

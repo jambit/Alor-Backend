@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Random;
 import org.junit.jupiter.api.*;
 
 class DatabaseConnectionTest {
@@ -17,6 +18,21 @@ class DatabaseConnectionTest {
   static void init() throws IOException, SQLException {
     DatabaseConnection.setPropertyPath("config/appTest.properties");
     databaseConnection = DatabaseConnection.getInstance();
+
+    if (DatabaseConnection.getDatabaseDriver() == DatabaseConnection.databaseDrivers.h2) {
+      StringBuilder sql =
+          new StringBuilder()
+              .append(
+                  "CREATE TABLE MoodMeter "
+                      + "( ID INT NOT NULL auto_increment,"
+                      + " Time INT NOT NULL,"
+                      + " Vote INT NOT NULL"
+                      + ");");
+      databaseConnection
+          .getActiveDatabaseConnection()
+          .createStatement()
+          .executeUpdate(sql.toString());
+    }
   }
 
   @Test
@@ -31,24 +47,26 @@ class DatabaseConnectionTest {
 
   @Test
   @Order(2)
-  public void filterMoodEntries_ReturnListOfAllEntriesInTimeSpan() throws SQLException {
+  public void fetchMoodEntries_ReturnListOfAllEntriesInTimeSpan() throws SQLException {
     long currentTime = System.currentTimeMillis() / 1000L;
-    float hours = (int) Math.round(Math.random() * 10 + 1);
-    long randomTime = (long) (currentTime - (hours * 60 * 60));
-    ArrayList<MoodEntry> expected = new ArrayList<>();
+    float time = 5;
+    Random random = new Random();
 
-    for (MoodEntry moodEntry : generateMoodEntryTestData(100)) {
-      databaseConnection.writeMoodEntry(moodEntry);
-      if (moodEntry.getTime() <= currentTime && moodEntry.getTime() >= randomTime) {
+    ArrayList<MoodEntry> expected = new ArrayList<>();
+    for (int i = 0; i < 20; i++) {
+      long randomTime = currentTime - ((random.nextInt((int) time) + 1) * 60 * 60);
+      MoodEntry moodEntry = new MoodEntry(5);
+      moodEntry = databaseConnection.writeMoodEntry(moodEntry);
+      if (randomTime >= currentTime - (time * 60 * 60)) {
         expected.add(moodEntry);
       }
     }
 
-    ArrayList<MoodEntry> actual = databaseConnection.fetchMoodEntries(hours);
+    ArrayList<MoodEntry> actual = databaseConnection.fetchMoodEntries(time);
 
-    assertEquals(actual.size(), expected.size());
+    assertEquals(expected.size(), actual.size());
     for (int i = 0; i < actual.size(); i++) {
-      assertTrue(expected.get(i).checkEquals(actual.get(i)));
+      assertEquals(expected.get(i).getId(), actual.get(i).getId());
     }
   }
 
@@ -62,7 +80,7 @@ class DatabaseConnectionTest {
     ArrayList<MoodEntry> testData = new ArrayList<>();
     for (int i = 0; i < amount; i++) {
       MoodEntry input = new MoodEntry((int) Math.round(Math.random() * 10));
-      input.setTime((System.currentTimeMillis() / 1000) - Math.round(Math.random() * 10));
+      input.setTime((System.currentTimeMillis() / 1000) - Math.round(Math.random() * 10 * 60 * 60));
       testData.add(input);
     }
 
