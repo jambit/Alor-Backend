@@ -13,7 +13,7 @@ public class MoodMeterAverageService {
 
   private MoodMeterAverageService() {}
 
-  public Object run() throws IOException, SQLException {
+  public Object run() throws IOException, SQLException, ClassNotFoundException {
     DatabaseConnection db = DatabaseConnection.getInstance();
 
     return calculateMoodAverage(db.fetchMoodEntries(time));

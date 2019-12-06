@@ -15,7 +15,7 @@ class DatabaseConnectionTest {
   private static DatabaseConnection databaseConnection;
 
   @BeforeAll
-  static void init() throws IOException, SQLException {
+  static void init() throws IOException, SQLException, ClassNotFoundException {
     DatabaseConnection.setPropertyPath("config/appTest.properties");
     databaseConnection = DatabaseConnection.getInstance();
 
@@ -71,7 +71,8 @@ class DatabaseConnectionTest {
   }
 
   @Test
-  public void singletonDatabase_ReturnSameObjectID() throws IOException, SQLException {
+  public void singletonDatabase_ReturnSameObjectID()
+      throws IOException, SQLException, ClassNotFoundException {
     DatabaseConnection newInstance = DatabaseConnection.getInstance();
     assertEquals(newInstance, databaseConnection);
   }

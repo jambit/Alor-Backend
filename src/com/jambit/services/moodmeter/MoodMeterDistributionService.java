@@ -13,7 +13,7 @@ public class MoodMeterDistributionService {
 
   private MoodMeterDistributionService() {}
 
-  public int[] run() throws IOException, SQLException {
+  public int[] run() throws IOException, SQLException, ClassNotFoundException {
     DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
 
     return getDistribution(databaseConnection.fetchMoodEntries(time));
