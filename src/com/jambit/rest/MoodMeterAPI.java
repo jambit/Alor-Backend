@@ -16,10 +16,15 @@ public class MoodMeterAPI {
   @GET
   @Path("avg")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getAvg(@DefaultValue("4") @QueryParam("t") String time) {
+  public Response getAvg(@DefaultValue("4") @QueryParam("t") String time)
+          throws IOException, SQLException {
     MoodMeterAverageService moodMeterAverageService = MoodMeterAverageService.getInstance();
     moodMeterAverageService.setTime(Float.parseFloat(time));
-    return Response.status(200).entity(moodMeterAverageService.run()).build();
+    try {
+      return Response.status(200).entity(moodMeterAverageService.run()).build();
+    } catch (ClassNotFoundException e) {
+      return Response.status(500).entity(e.getMessage()).build();
+    }
   }
 
   @GET
@@ -27,14 +32,14 @@ public class MoodMeterAPI {
   @Produces(MediaType.APPLICATION_JSON)
   public Response getDistribution(@DefaultValue("4") @QueryParam("t") String time) {
     MoodMeterDistributionService moodMeterDistributionService =
-        MoodMeterDistributionService.getInstance();
+            MoodMeterDistributionService.getInstance();
     moodMeterDistributionService.setTime(Float.parseFloat(time));
 
     try {
       return Response.status(200).entity(moodMeterDistributionService.run()).build();
-    } catch (IOException | SQLException e) {
+    } catch (IOException | SQLException | ClassNotFoundException e) {
       e.printStackTrace();
-      return Response.status(404).entity(e).build();
+      return Response.status(404).entity(e.getMessage()).build();
     }
   }
 
@@ -49,7 +54,11 @@ public class MoodMeterAPI {
     } catch (NumberFormatException e) {
       return Response.status(422).entity(e.getMessage()).build();
     }
-    MoodEntry result = DatabaseConnection.getInstance().writeMoodEntry(write);
-    return Response.status(201).entity(result).build();
+    try {
+      MoodEntry result = DatabaseConnection.getInstance().writeMoodEntry(write);
+      return Response.status(201).entity(result).build();
+    } catch (ClassNotFoundException e) {
+      return Response.status(500).entity(e.getMessage()).build();
+    }
   }
 }

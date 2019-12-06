@@ -1,6 +1,10 @@
 package com.jambit.services.moodmeter;
 
+import com.jambit.DatabaseConnection;
 import com.jambit.domain.MoodEntry;
+
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class MoodMeterAverageService {
@@ -10,8 +14,10 @@ public class MoodMeterAverageService {
 
   private MoodMeterAverageService() {}
 
-  public Object run() {
-    return calculateMoodAverage(new ArrayList<MoodEntry>());
+  public Object run() throws SQLException, IOException, ClassNotFoundException {
+    DatabaseConnection connection = DatabaseConnection.getInstance();
+
+    return calculateMoodAverage(connection.fetchMoodEntries(time));
   }
 
   public static MoodMeterAverageService getInstance() {
