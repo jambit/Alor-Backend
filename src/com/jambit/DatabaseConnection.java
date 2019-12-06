@@ -59,7 +59,7 @@ public class DatabaseConnection {
     databaseProps.load(new FileInputStream(PROPERTY_PATH));
 
     /*tomcat requires to check class existence. Otherwise tomcat crashes.*/
-      Class.forName("com.mysql.cj.jdbc.Driver");
+      Class.forName("com.mysql.jdbc.Driver");
 
     if (databaseProps.getProperty("h2.active").equals("true")) {
       databaseDriver = databaseDrivers.h2;
