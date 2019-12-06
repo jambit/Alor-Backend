@@ -71,7 +71,8 @@ class DatabaseConnectionTest {
   }
 
   @Test
-  public void singletonDatabase_ReturnSameObjectID() throws IOException, SQLException, ClassNotFoundException {
+  public void singletonDatabase_ReturnSameObjectID()
+      throws IOException, SQLException, ClassNotFoundException {
     DatabaseConnection newInstance = DatabaseConnection.getInstance();
     assertEquals(newInstance, databaseConnection);
   }

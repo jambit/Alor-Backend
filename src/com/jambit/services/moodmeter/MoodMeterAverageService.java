@@ -2,7 +2,6 @@ package com.jambit.services.moodmeter;
 
 import com.jambit.DatabaseConnection;
 import com.jambit.domain.MoodEntry;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;

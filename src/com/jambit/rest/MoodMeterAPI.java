@@ -17,7 +17,7 @@ public class MoodMeterAPI {
   @Path("avg")
   @Produces(MediaType.APPLICATION_JSON)
   public Response getAvg(@DefaultValue("4") @QueryParam("t") String time)
-          throws IOException, SQLException {
+      throws IOException, SQLException {
     MoodMeterAverageService moodMeterAverageService = MoodMeterAverageService.getInstance();
     moodMeterAverageService.setTime(Float.parseFloat(time));
     try {
@@ -32,7 +32,7 @@ public class MoodMeterAPI {
   @Produces(MediaType.APPLICATION_JSON)
   public Response getDistribution(@DefaultValue("4") @QueryParam("t") String time) {
     MoodMeterDistributionService moodMeterDistributionService =
-            MoodMeterDistributionService.getInstance();
+        MoodMeterDistributionService.getInstance();
     moodMeterDistributionService.setTime(Float.parseFloat(time));
 
     try {

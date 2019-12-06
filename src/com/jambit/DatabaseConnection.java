@@ -43,7 +43,8 @@ public class DatabaseConnection {
     return databaseProps;
   }
 
-  public static DatabaseConnection getInstance() throws IOException, SQLException, ClassNotFoundException {
+  public static DatabaseConnection getInstance()
+      throws IOException, SQLException, ClassNotFoundException {
     if (System.getenv("CATALINA_HOME") == null) {
       CATALINA_HOME_PATH = "";
     }
@@ -59,7 +60,7 @@ public class DatabaseConnection {
     databaseProps.load(new FileInputStream(PROPERTY_PATH));
 
     /*tomcat requires to check class existence. Otherwise tomcat crashes.*/
-      Class.forName("com.mysql.jdbc.Driver");
+    Class.forName("com.mysql.jdbc.Driver");
 
     if (databaseProps.getProperty("h2.active").equals("true")) {
       databaseDriver = databaseDrivers.h2;
